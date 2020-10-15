@@ -56,5 +56,20 @@ func (s *Solver) Solve() bool {
 			}
 		}
 	}
-	return false
+
+}
+
+//HowManySolutions returns the total number of solutions available for the input size.
+func HowManySolutions(size int) int {
+
+	s := new(Solver)
+
+	s.Size = size
+	s.Queens = make([]int, size)
+
+	var i int
+	for i = 0; s.Solve(); i++ {
+	}
+
+	return i
 }

@@ -66,3 +66,58 @@ func TestSolve8Queens(t *testing.T) {
 		}
 	}
 }
+
+func TestCountSolutions(t *testing.T) {
+	vs := []struct {
+		size     int
+		expected int
+	}{
+		{
+			1,
+			1,
+		},
+		{
+			2,
+			0,
+		},
+		{
+			3,
+			0,
+		},
+		{
+			4,
+			2,
+		},
+		{
+			5,
+			10,
+		},
+		{
+			6,
+			4,
+		},
+		{
+			7,
+			40,
+		},
+		{
+			8,
+			92,
+		},
+		{
+			9,
+			352,
+		},
+		{
+			10,
+			724,
+		},
+
+	}
+	for _, v := range vs {
+		actual := HowManySolutions(v.size)
+		if actual != v.expected {
+			t.Errorf("For size %d the function has found %d solutions, and the expected value is %d.\n", v.size, actual, v.expected)
+		}
+	}
+}
