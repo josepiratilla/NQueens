@@ -1,5 +1,10 @@
 package nqueens
 
+import (
+	"runtime"
+	"sync"
+)
+
 //Solver is the main data type to solve the NQueens problem
 type Solver struct {
 	Size   int
@@ -31,19 +36,25 @@ func abs(x int) int {
 //Solve solves the next N Queens problem, starting form the position given by the solver.
 func (s *Solver) Solve() bool {
 
-	row := 0
+	return s.solveFromRow(0)
+
+}
+
+func (s *Solver) solveFromRow(fixedRow int) bool {
+	row := fixedRow
 	for i := 0; i < s.Size; i++ {
+		row = i
 		if s.Queens[i] == 0 {
 			break
 		}
-		row = i
+
 	}
 
 	for {
 		if s.Queens[row] == s.Size {
 			s.Queens[row] = 0
 			row--
-			if row < 0 {
+			if row < fixedRow {
 				return false
 			}
 			continue
@@ -56,7 +67,6 @@ func (s *Solver) Solve() bool {
 			}
 		}
 	}
-
 }
 
 //HowManySolutions returns the total number of solutions available for the input size.
@@ -69,6 +79,49 @@ func HowManySolutions(size int) int {
 
 	var i int
 	for i = 0; s.Solve(); i++ {
+	}
+
+	return i
+}
+
+//HowManySolutionsConcurrent returns the total number of solutions available for the input size starting as many threads as the size
+func HowManySolutionsConcurrent(size int) int {
+
+	sols := make([]int, size)
+	var wg sync.WaitGroup
+
+	parallelThreads := runtime.NumCPU() - 1
+	if parallelThreads <= 0 {
+		parallelThreads = 1
+	}
+
+	execs := make(chan int)
+
+	go func() {
+		for i := 0; i < size; i++ {
+			execs <- i
+		}
+		close(execs)
+	}()
+
+	for i := 0; i < parallelThreads; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for exec := range execs {
+				s := new(Solver)
+				s.Size = size
+				s.Queens = make([]int, size)
+				s.Queens[0] = exec
+				for ; s.solveFromRow(1); sols[exec]++ {
+				}
+			}
+		}()
+	}
+	wg.Wait()
+	i := 0
+	for _, sol := range sols {
+		i += sol
 	}
 
 	return i

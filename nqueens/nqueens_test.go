@@ -112,12 +112,15 @@ func TestCountSolutions(t *testing.T) {
 			10,
 			724,
 		},
-
 	}
 	for _, v := range vs {
 		actual := HowManySolutions(v.size)
 		if actual != v.expected {
 			t.Errorf("For size %d the function has found %d solutions, and the expected value is %d.\n", v.size, actual, v.expected)
+		}
+		actualc := HowManySolutionsConcurrent(v.size)
+		if actualc != v.expected {
+			t.Errorf("For size %d the concurrent function has found %d solutions, and the expected value is %d.\n", v.size, actualc, v.expected)
 		}
 	}
 }
